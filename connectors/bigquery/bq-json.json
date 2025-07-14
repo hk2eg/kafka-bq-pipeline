@@ -1,0 +1,71 @@
+{
+  "name": "bqkc2",
+  "config": {
+    "connector.class": "com.wepay.kafka.connect.bigquery.BigQuerySinkConnector",
+    "tasks.max":       "1",
+
+    "project":         "${env:GCP_PROJECT}",
+    "defaultDataset":  "${env:BQ_DATASET}",
+    "gcsBucketName":   "${env:BQ_BUCKET}",
+    "keySource":       "FILE",
+    "keyfile":         "${env:BQ_KEYFILE}",
+
+    "topics.regex": "^(dcs-demo1\\.ecomm\\.(users|products|orders|order_items))$",
+    "sanitizeTopics": "true", 
+
+    "key.converter":   "io.confluent.connect.avro.AvroConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "key.converter.schema.registry.url":   "http://schema-registry:8081",
+    "value.converter.schema.registry.url": "http://schema-registry:8081",
+
+    "upsertEnabled":     "true",
+    "kafkaKeyFieldName": "id",
+
+    "autoCreateTables": "true",
+    "allowNewBigQueryFields": "true",
+    "allowBigQueryRequiredFieldRelaxation": "true",
+    "allBQFieldsNullable": "true",
+
+    "transforms":
+      "RenameUserKey,RenameProductKey,RenameOrderKey,RenameOrderItemKey,insertTS,formatTS",
+
+    "predicates": "isUsers,isProducts,isOrders,isOrderItems",
+
+    "transforms.RenameUserKey.type":      "org.apache.kafka.connect.transforms.ReplaceField$Key",
+    "transforms.RenameUserKey.renames":   "user_id:id",
+    "transforms.RenameUserKey.predicate": "isUsers",
+
+    "transforms.RenameProductKey.type":      "org.apache.kafka.connect.transforms.ReplaceField$Key",
+    "transforms.RenameProductKey.renames":   "product_id:id",
+    "transforms.RenameProductKey.predicate": "isProducts",
+
+    "transforms.RenameOrderKey.type":      "org.apache.kafka.connect.transforms.ReplaceField$Key",
+    "transforms.RenameOrderKey.renames":   "order_id:id",
+    "transforms.RenameOrderKey.predicate": "isOrders",
+
+    "transforms.RenameOrderItemKey.type":      "org.apache.kafka.connect.transforms.ReplaceField$Key",
+    "transforms.RenameOrderItemKey.renames":   "order_item_id:id",
+    "transforms.RenameOrderItemKey.predicate": "isOrderItems",
+
+
+    "predicates.isUsers.type":       "org.apache.kafka.connect.transforms.predicates.TopicNameMatches",
+    "predicates.isUsers.pattern":    "dcs-demo1\\.ecomm\\.users",
+
+    "predicates.isProducts.type":    "org.apache.kafka.connect.transforms.predicates.TopicNameMatches",
+    "predicates.isProducts.pattern": "dcs-demo1\\.ecomm\\.products",
+
+    "predicates.isOrders.type":      "org.apache.kafka.connect.transforms.predicates.TopicNameMatches",
+    "predicates.isOrders.pattern":   "dcs-demo1\\.ecomm\\.orders",
+
+    "predicates.isOrderItems.type":    "org.apache.kafka.connect.transforms.predicates.TopicNameMatches",
+    "predicates.isOrderItems.pattern": "dcs-demo1\\.ecomm\\.order_items",
+
+    "transforms.insertTS.type":            "org.apache.kafka.connect.transforms.InsertField$Value",
+    "transforms.insertTS.timestamp.field": "messageTS",
+
+    "transforms.formatTS.type":        "org.apache.kafka.connect.transforms.TimestampConverter$Value",
+    "transforms.formatTS.field":       "messageTS",
+    "transforms.formatTS.target.type": "string",
+    "transforms.formatTS.format":      "yyyy-MM-dd HH:mm:ss:SSS"
+  }
+}

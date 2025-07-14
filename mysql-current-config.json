@@ -1,0 +1,18 @@
+{
+  "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+  "database.user": "root",
+  "database.server.id": "184054",
+  "schema.history.internal.kafka.bootstrap.servers": "broker:29092",
+  "event.processing.failure.handling.mode": "ignore",
+  "database.port": "3306",
+  "include.schema.changes": "true",
+  "topic.prefix": "dcs-demo1",
+  "schema.history.internal.kafka.topic": "schemahistory.ecomm",
+  "database.hostname": "mysql2",
+  "database.password": "root",
+  "name": "mysql-js",
+  "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+  "database.include.list": "ecomm",
+  "snapshot.mode": "initial"
+}
